@@ -5,6 +5,7 @@ namespace Expload {
 
     [Program]
     public class GameToken {
+        public static void Main() { }
 
         public Mapping<Bytes, UInt32> Balance = 
             new Mapping<Bytes, UInt32>();
@@ -12,12 +13,6 @@ namespace Expload {
         public Mapping<Bytes, int> WhiteList =
             new Mapping<Bytes, int>();
         
-        private void assertIsOwner() {
-            if (Info.Sender() != Info.Owner(Info.ProgramAddress())) {
-              Error.Throw("Only owner of the program can do that.");
-            }
-        }
-
         // Gives amount of GameTokens to recipient.
         public void Give(Bytes recipient, UInt32 amount) {
             assertIsOwner();
@@ -49,9 +44,11 @@ namespace Expload {
             WhiteList.put(address, 0);
         }
 
-        // Check address is white listed/
-        private bool WhiteListCheck(Bytes address) {
-            return WhiteList.getDefault(address, 0) == 1;
+        public UInt32 MyBalance()
+        {
+            Bytes sender = Info.Sender();
+            UInt32 senderBalance = Balance.getDefault(sender, 0);
+            return senderBalance;
         }
 
         // Send GameTokens from transaction Sender to recipient.
@@ -67,8 +64,23 @@ namespace Expload {
                 } else {
                     Error.Throw("Not enough funds");
                 }
+            } else Error.Throw("Operation denied");
+        }
+        
+        //// Private methods
+
+        // Check address is white listed/
+        private bool WhiteListCheck(Bytes address)
+        {
+            return WhiteList.getDefault(address, 0) == 1;
+        }
+
+        private void assertIsOwner()
+        {
+            if (Info.Sender() != Info.Owner(Info.ProgramAddress()))
+            {
+                Error.Throw("Only owner of the program can do that.");
             }
         }
-        public static void Main() { }
     }
 }
