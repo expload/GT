@@ -6,10 +6,6 @@
     <AssemblyName>$(PackageId)</AssemblyName>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Expload.Pravda" Version="0.7.0" />
+    <PackageReference Include="Expload.Pravda" Version="0.9.7" />
   </ItemGroup>
-  <Target Name="PravdaTranslation" AfterTargets="Publish">
-      <Exec Command="echo &quot;Running pravda translation: $(PublishDir) -> $(PublishDir)$(PackageId).pbc &quot;"/>
-      <Exec Command="pravda compile dotnet -i $(PublishDir) -o $(PublishDir)$(PackageId).pbc"/>
-  </Target>
 </Project>
