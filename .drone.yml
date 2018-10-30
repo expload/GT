@@ -10,7 +10,9 @@ pipeline:
     image: alpine/git:1.0.4
     pull: false
     commands:
-      - echo -n `git describe --tags | sed -e "s/^v//"`",release"
+      - echo -n `git describe --tags | sed -e "s/^v//"`",release" > .tags
+    when:
+      event: tag
   publish-docker-image-prod:
     image: plugins/gcr
     registry: gcr.io/time-coin
@@ -18,5 +20,10 @@ pipeline:
     context: .
     dockerfile: ./docker/expload-gametoken/Dockerfile
     secrets: [ gcr_json_key ]
+    when:
+      event: tag
+  update-gametoken-program-on-public-node:
+    image: gcr.io/time-coin/gametoken-program-updater:0.6.1
+    secrets: [ gametoken_wallet_address, gametoken_wallet_private_key ]
     when:
       event: tag
