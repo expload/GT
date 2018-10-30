@@ -61,8 +61,9 @@ namespace Expload {
                 if (senderBalance >= amount) {
                     Balance.put(sender, senderBalance - amount);
                     Balance.put(recipient, recipientBalance + amount);
+                    Log.Event("GameToken:Spend", new SpendEventData(recipient, amount));
                 } else {
-                    Error.Throw("Not enough funds");
+                    Error.Throw("GameTokenError: Not enough funds for Spend operation");
                 }
             } else Error.Throw("Operation denied");
         }
@@ -77,10 +78,19 @@ namespace Expload {
 
         private void assertIsOwner()
         {
-            if (Info.Sender() != Info.Owner(Info.ProgramAddress()))
+            if (Info.Sender() != Info.ProgramAddress())
             {
                 Error.Throw("Only owner of the program can do that.");
             }
         }
+    }
+
+    class SpendEventData {
+        public SpendEventData(Bytes recipient, UInt32 amount) {
+            this.recipient = recipient;
+            this.amount = amount;
+        }
+        public UInt32 amount;
+        public Bytes recipient;
     }
 }
