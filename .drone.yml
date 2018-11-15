@@ -13,6 +13,19 @@ pipeline:
       - echo -n `git describe --tags | sed -e "s/^v//"`",release" > .tags
     when:
       event: tag
+  package-publish-nuget:
+    group: publish
+    image: microsoft/dotnet:2-sdk
+    environment:
+      - GT_VERSION=${DRONE_TAG##v}
+    commands:
+      - cd /workdir/code
+      - dotnet build -c Release
+      - dotnet pack -c Release
+      - dotnet nuget push bin/Release/Expload.GameToken.$GT_VERSION.nupkg -k $NUGET_KEY -s https://api.nuget.org/v3/index.json
+    secrets: [ nuget_key ]
+    when:
+      event: tag
   publish-docker-image-prod:
     image: plugins/gcr
     registry: gcr.io/time-coin
