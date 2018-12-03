@@ -8,5 +8,9 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Expload.Pravda" Version="0.13.0" />
+    <!-- If the program is testing in the local environment the following reference to the latest Pravda could be used -->
+    <!-- <Reference Include="Expload.Pravda">
+      <HintPath>../Pravda/PravdaDotNet/bin/Release/netstandard2.0/Pravda.dll</HintPath>
+    </Reference> -->
   </ItemGroup>
 </Project>

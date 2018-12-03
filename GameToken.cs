@@ -7,28 +7,31 @@ namespace Expload {
     public class GameToken {
         public static void Main() { }
 
-        private Mapping<Bytes, UInt32> Balance = 
-            new Mapping<Bytes, UInt32>();
+        private Mapping<Bytes, Int32> Balance = 
+            new Mapping<Bytes, Int32>();
 
-        private Mapping<Bytes, int> WhiteList =
-            new Mapping<Bytes, int>();
+        private Mapping<Bytes, sbyte> WhiteList =
+            new Mapping<Bytes, sbyte>();
         
         // Gives amount of GameTokens to recipient.
-        public void Give(Bytes recipient, UInt32 amount) {
+        public void Give(Bytes recipient, Int32 amount) {
             assertIsOwner();
-            UInt32 lastBalance = Balance.GetOrDefault(recipient, 0);
-            UInt32 newBalance = lastBalance + amount;
+            Require(amount > 0, "Amount must be positive");
+
+            Int32 lastBalance = Balance.GetOrDefault(recipient, 0);
+            Int32 newBalance = lastBalance + amount;
             Balance[recipient] = newBalance;
         }
 
         // Remove amount of GameTokens from balance of address.
-        public void Burn(Bytes address, UInt32 amount) {
+        public void Burn(Bytes address, Int32 amount) {
             assertIsOwner();
-            UInt32 balance = Balance.GetOrDefault(address, 0);
+            Require(amount > 0, "Amount must be positive");
+            Int32 balance = Balance.GetOrDefault(address, 0);
             if (balance >= amount) {
                 Balance[address] = balance - amount;
             } else {
-                Error.Throw("Not enough funds");
+                Error.Throw("Not enough funds for Burn");
             }
         }
 
@@ -44,20 +47,21 @@ namespace Expload {
             WhiteList[address] = 0;
         }
 
-        public UInt32 MyBalance()
+        public Int32 MyBalance()
         {
             Bytes sender = Info.Sender();
-            UInt32 senderBalance = Balance.GetOrDefault(sender, 0);
+            Int32 senderBalance = Balance.GetOrDefault(sender, 0);
             return senderBalance;
         }
 
         // Send GameTokens from transaction Sender to recipient.
         // Recipient should be present in the Game Developers white list.
-        public void Spend(Bytes recipient, UInt32 amount) {
+        public void Spend(Bytes recipient, Int32 amount) {
             if (WhiteListCheck(recipient)) {
+                Require(amount > 0, "Amount must be positive");
                 Bytes sender = Info.Sender();
-                UInt32 senderBalance = Balance.GetOrDefault(sender, 0);
-                UInt32 recipientBalance = Balance.GetOrDefault(recipient, 0);
+                Int32 senderBalance = Balance.GetOrDefault(sender, 0);
+                Int32 recipientBalance = Balance.GetOrDefault(recipient, 0);
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
@@ -83,14 +87,22 @@ namespace Expload {
                 Error.Throw("Only owner of the program can do that.");
             }
         }
+
+        private void Require(Boolean condition, String message)
+        {
+            if (!condition)
+            {
+                Error.Throw(message);
+            }
+        }
     }
 
     class SpendEventData {
-        public SpendEventData(Bytes recipient, UInt32 amount) {
+        public SpendEventData(Bytes recipient, Int32 amount) {
             this.recipient = recipient;
             this.amount = amount;
         }
-        public UInt32 amount;
+        public Int32 amount;
         public Bytes recipient;
     }
 }
