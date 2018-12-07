@@ -13,30 +13,27 @@ pipeline:
       - echo -n `git describe --tags | sed -e "s/^v//"`",release" > .tags
     when:
       event: tag
+  test-compile-and-translate:
+    environment:
+      - GAMETOKEN_VERSION=${DRONE_TAG##v}
+    image: gcr.io/time-coin/gametoken-program-translator:0.3
+    pull: true
   package-publish-nuget:
     group: publish
     image: microsoft/dotnet:2-sdk
     environment:
-      - GT_VERSION=${DRONE_TAG##v}
+      - GAMETOKEN_VERSION=${DRONE_TAG##v}
     commands:
       - cd /workdir/code
       - dotnet build -c Release
       - dotnet pack -c Release
-      - dotnet nuget push bin/Release/Expload.GameToken.$GT_VERSION.nupkg -k $NUGET_KEY -s https://api.nuget.org/v3/index.json
+      - dotnet nuget push bin/Release/Expload.GameToken.$GAMETOKEN_VERSION.nupkg -k $NUGET_KEY -s https://api.nuget.org/v3/index.json
     secrets: [ nuget_key ]
     when:
       event: tag
-  publish-docker-image-prod:
-    image: plugins/gcr
-    registry: gcr.io/time-coin
-    repo: gcr.io/time-coin/expload-gametoken
-    context: .
-    dockerfile: ./docker/expload-gametoken/Dockerfile
-    secrets: [ gcr_json_key ]
-    when:
-      event: tag
   update-gametoken-program-on-public-node:
-    image: gcr.io/time-coin/gametoken-program-updater:0.6.1
-    secrets: [ gametoken_wallet_address, gametoken_wallet_private_key ]
+    image: gcr.io/time-coin/gametoken-program-updater:0.7.2
+    pull: true
+    secrets: [ gametoken_wallet_address, gametoken_wallet_private_key, whitelist ]
     when:
       event: tag
