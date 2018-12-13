@@ -21,6 +21,7 @@ namespace Expload {
             Int32 lastBalance = Balance.GetOrDefault(recipient, 0);
             Int32 newBalance = lastBalance + amount;
             Balance[recipient] = newBalance;
+            Log.Event("GameToken:Give", new EventData(recipient, amount));
         }
 
         // Remove amount of GameTokens from balance of address.
@@ -30,6 +31,7 @@ namespace Expload {
             Int32 balance = Balance.GetOrDefault(address, 0);
             if (balance >= amount) {
                 Balance[address] = balance - amount;
+                Log.Event("GameToken:Burn", new EventData(address, amount));
             } else {
                 Error.Throw("Not enough funds for Burn");
             }
@@ -65,7 +67,7 @@ namespace Expload {
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
-                    Log.Event("GameToken:Spend", new SpendEventData(recipient, amount));
+                    Log.Event("GameToken:Spend", new EventData(recipient, amount));
                 } else {
                     Error.Throw("GameTokenError: Not enough funds for Spend operation");
                 }
@@ -97,8 +99,8 @@ namespace Expload {
         }
     }
 
-    class SpendEventData {
-        public SpendEventData(Bytes recipient, Int32 amount) {
+    class EventData {
+        public EventData(Bytes recipient, Int32 amount) {
             this.recipient = recipient;
             this.amount = amount;
         }
