@@ -73,6 +73,31 @@ namespace Expload {
                 }
             } else Error.Throw("Operation denied");
         }
+
+        // Check if GameToken program was called from another program
+        private bool IsCalledFrom(Bytes address) {
+            if(Info.Callers().Length < 2) return false;
+            if(Info.Callers()[Info.Callers().Length-2] != address) return false;
+            return true;
+        }
+
+        // Send GameTokens from recipient to sender.
+        // Sender should be present in the Game Developers white list.
+        // Can only be called from program present in the Game Developers white list or by such program.
+        public void Refund(Bytes sender, Bytes recipient, Int32 amount) {
+            if (WhiteListCheck(sender) && (Info.Sender() == sender || IsCalledFrom(sender))) {
+                Require(amount > 0, "Amount must be positive");
+                Int32 senderBalance = Balance.GetOrDefault(sender, 0);
+                Int32 recipientBalance = Balance.GetOrDefault(recipient, 0);
+                if (senderBalance >= amount) {
+                    Balance[sender] = senderBalance - amount;
+                    Balance[recipient] = recipientBalance + amount;
+                    Log.Event("GameToken:Refund", new EventData(recipient, amount));
+                } else {
+                    Error.Throw("GameTokenError: Not enough funds for Refund operation");
+                }
+            } else Error.Throw("Operation denied");
+        }
         
         //// Private methods
 
