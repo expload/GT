@@ -1,5 +1,5 @@
-# GT
-Expload GameToken Pravda Program
+# XGold
+Expload XGold Pravda Program
 
 ## Whitelisting of the known addresses
 

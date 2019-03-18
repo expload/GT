@@ -4,16 +4,16 @@ namespace Expload {
     using System;
 
     [Program]
-    public class GameToken {
+    public class XGold {
         public static void Main() { }
 
-        private Mapping<Bytes, Int32> Balance = 
+        private Mapping<Bytes, Int32> Balance =
             new Mapping<Bytes, Int32>();
 
         private Mapping<Bytes, sbyte> WhiteList =
             new Mapping<Bytes, sbyte>();
-        
-        // Gives amount of GameTokens to recipient.
+
+        // Gives amount of XGold to recipient.
         public void Give(Bytes recipient, Int32 amount) {
             assertIsOwner();
             Require(amount > 0, "Amount must be positive");
@@ -21,17 +21,17 @@ namespace Expload {
             Int32 lastBalance = Balance.GetOrDefault(recipient, 0);
             Int32 newBalance = lastBalance + amount;
             Balance[recipient] = newBalance;
-            Log.Event("GameToken:Give", new EventData(recipient, amount));
+            Log.Event("Give", new EventData(recipient, amount));
         }
 
-        // Remove amount of GameTokens from balance of address.
+        // Remove amount of XGold from balance of address.
         public void Burn(Bytes address, Int32 amount) {
             assertIsOwner();
             Require(amount > 0, "Amount must be positive");
             Int32 balance = Balance.GetOrDefault(address, 0);
             if (balance >= amount) {
                 Balance[address] = balance - amount;
-                Log.Event("GameToken:Burn", new EventData(address, amount));
+                Log.Event("Burn", new EventData(address, amount));
             } else {
                 Error.Throw("Not enough funds for Burn");
             }
@@ -56,7 +56,7 @@ namespace Expload {
             return senderBalance;
         }
 
-        // Send GameTokens from transaction Sender to recipient.
+        // Send XGold from transaction Sender to recipient.
         // Recipient should be present in the Game Developers white list.
         public void Spend(Bytes recipient, Int32 amount) {
             if (WhiteListCheck(recipient)) {
@@ -67,21 +67,21 @@ namespace Expload {
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
-                    Log.Event("GameToken:Spend", new EventData(recipient, amount));
+                    Log.Event("Spend", new EventData(recipient, amount));
                 } else {
-                    Error.Throw("GameTokenError: Not enough funds for Spend operation");
+                    Error.Throw("XGoldError: Not enough funds for Spend operation");
                 }
             } else Error.Throw("Operation denied");
         }
 
-        // Check if GameToken program was called from another program
+        // Check if XGold program was called from another program
         private bool IsCalledFrom(Bytes address) {
             if(Info.Callers().Length < 2) return false;
             if(Info.Callers()[Info.Callers().Length-2] != address) return false;
             return true;
         }
 
-        // Send GameTokens from recipient to sender.
+        // Send XGolds from recipient to sender.
         // Sender should be present in the Game Developers white list.
         // Can only be called from program present in the Game Developers white list or by such program.
         public void Refund(Bytes sender, Bytes recipient, Int32 amount) {
@@ -92,13 +92,13 @@ namespace Expload {
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
-                    Log.Event("GameToken:Refund", new EventData(recipient, amount));
+                    Log.Event("Refund", new EventData(recipient, amount));
                 } else {
-                    Error.Throw("GameTokenError: Not enough funds for Refund operation");
+                    Error.Throw("XGoldError: Not enough funds for Refund operation");
                 }
             } else Error.Throw("Operation denied");
         }
-        
+
         //// Private methods
 
         // Check address is white listed/
