@@ -5,6 +5,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>$(PackageId)</AssemblyName>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Expload.Pravda" Version="0.*" />
