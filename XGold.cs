@@ -7,12 +7,12 @@ namespace Expload {
     public class XGold {
         public static void Main() { }
 
-        private Mapping<Bytes, Int32> Balance = 
+        private Mapping<Bytes, Int32> Balance =
             new Mapping<Bytes, Int32>();
 
         private Mapping<Bytes, sbyte> WhiteList =
             new Mapping<Bytes, sbyte>();
-        
+
         // Gives amount of XGold to recipient.
         public void Give(Bytes recipient, Int32 amount) {
             assertIsOwner();
@@ -21,7 +21,7 @@ namespace Expload {
             Int32 lastBalance = Balance.GetOrDefault(recipient, 0);
             Int32 newBalance = lastBalance + amount;
             Balance[recipient] = newBalance;
-            Log.Event("XGold:Give", new EventData(recipient, amount));
+            Log.Event("Give", new EventData(recipient, amount));
         }
 
         // Remove amount of XGold from balance of address.
@@ -31,7 +31,7 @@ namespace Expload {
             Int32 balance = Balance.GetOrDefault(address, 0);
             if (balance >= amount) {
                 Balance[address] = balance - amount;
-                Log.Event("XGold:Burn", new EventData(address, amount));
+                Log.Event("Burn", new EventData(address, amount));
             } else {
                 Error.Throw("Not enough funds for Burn");
             }
@@ -67,7 +67,7 @@ namespace Expload {
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
-                    Log.Event("XGold:Spend", new EventData(recipient, amount));
+                    Log.Event("Spend", new EventData(recipient, amount));
                 } else {
                     Error.Throw("XGoldError: Not enough funds for Spend operation");
                 }
@@ -92,13 +92,13 @@ namespace Expload {
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
-                    Log.Event("XGold:Refund", new EventData(recipient, amount));
+                    Log.Event("Refund", new EventData(recipient, amount));
                 } else {
                     Error.Throw("XGoldError: Not enough funds for Refund operation");
                 }
             } else Error.Throw("Operation denied");
         }
-        
+
         //// Private methods
 
         // Check address is white listed/
