@@ -7,28 +7,28 @@ namespace Expload {
     public class XGold {
         public static void Main() { }
 
-        private Mapping<Bytes, Int32> Balance =
-            new Mapping<Bytes, Int32>();
+        private Mapping<Bytes, Int64> Balance =
+            new Mapping<Bytes, Int64>();
 
         private Mapping<Bytes, sbyte> WhiteList =
             new Mapping<Bytes, sbyte>();
 
         // Gives amount of XGold to recipient.
-        public void Give(Bytes recipient, Int32 amount) {
+        public void Give(Bytes recipient, Int64 amount) {
             assertIsOwner();
             Require(amount > 0, "Amount must be positive");
 
-            Int32 lastBalance = Balance.GetOrDefault(recipient, 0);
-            Int32 newBalance = lastBalance + amount;
+            Int64 lastBalance = Balance.GetOrDefault(recipient, 0);
+            Int64 newBalance = lastBalance + amount;
             Balance[recipient] = newBalance;
             Log.Event("Give", new EventData(recipient, amount));
         }
 
         // Remove amount of XGold from balance of address.
-        public void Burn(Bytes address, Int32 amount) {
+        public void Burn(Bytes address, Int64 amount) {
             assertIsOwner();
             Require(amount > 0, "Amount must be positive");
-            Int32 balance = Balance.GetOrDefault(address, 0);
+            Int64 balance = Balance.GetOrDefault(address, 0);
             if (balance >= amount) {
                 Balance[address] = balance - amount;
                 Log.Event("Burn", new EventData(address, amount));
@@ -49,21 +49,21 @@ namespace Expload {
             WhiteList[address] = 0;
         }
 
-        public Int32 MyBalance()
+        public Int64 MyBalance()
         {
             Bytes sender = Info.Sender();
-            Int32 senderBalance = Balance.GetOrDefault(sender, 0);
+            Int64 senderBalance = Balance.GetOrDefault(sender, 0);
             return senderBalance;
         }
 
         // Send XGold from transaction Sender to recipient.
         // Recipient should be present in the Game Developers white list.
-        public void Spend(Bytes recipient, Int32 amount) {
+        public void Spend(Bytes recipient, Int64 amount) {
             if (WhiteListCheck(recipient)) {
                 Require(amount > 0, "Amount must be positive");
                 Bytes sender = Info.Sender();
-                Int32 senderBalance = Balance.GetOrDefault(sender, 0);
-                Int32 recipientBalance = Balance.GetOrDefault(recipient, 0);
+                Int64 senderBalance = Balance.GetOrDefault(sender, 0);
+                Int64 recipientBalance = Balance.GetOrDefault(recipient, 0);
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
@@ -84,11 +84,11 @@ namespace Expload {
         // Send XGolds from recipient to sender.
         // Sender should be present in the Game Developers white list.
         // Can only be called from program present in the Game Developers white list or by such program.
-        public void Refund(Bytes sender, Bytes recipient, Int32 amount) {
+        public void Refund(Bytes sender, Bytes recipient, Int64 amount) {
             if (WhiteListCheck(sender) && (Info.Sender() == sender || IsCalledFrom(sender))) {
                 Require(amount > 0, "Amount must be positive");
-                Int32 senderBalance = Balance.GetOrDefault(sender, 0);
-                Int32 recipientBalance = Balance.GetOrDefault(recipient, 0);
+                Int64 senderBalance = Balance.GetOrDefault(sender, 0);
+                Int64 recipientBalance = Balance.GetOrDefault(recipient, 0);
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
@@ -125,11 +125,11 @@ namespace Expload {
     }
 
     class EventData {
-        public EventData(Bytes recipient, Int32 amount) {
+        public EventData(Bytes recipient, Int64 amount) {
             this.recipient = recipient;
             this.amount = amount;
         }
-        public Int32 amount;
+        public Int64 amount;
         public Bytes recipient;
     }
 }
