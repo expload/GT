@@ -1,5 +1,20 @@
 # Overview
 
+XGold is a virtual currency lives inside [Expload Platform](https://developers.expload.com/documentation/).
+It similar to Ethereum's ERC-20 token by the nature. But the main purpose is
+providing in-app purchasing in games integrated with Expload Platform.
+A user can buy XGold for the real currency like Euro and spend in any game on the Expload Platform.
+
+Since XGold program is a regular [Pravda](https://developers.expload.com/documentation/pravda/) program,
+thus it can be compiled and deployed and called as any other Pravda program.
+
+Source code of the program can be found on Github: `https://github.com/expload/XGold`.
+
+Documentation about how to compile and deploy program
+can be found [here](https://developers.expload.com/documentation/pravda/) in section *Compiling the Program*.
+
+## Terms
+
 Term         | Description
 -------------| -----------
 Sender       | Account who signed the transaction that contains calls program methods.
