@@ -81,9 +81,9 @@ namespace Expload {
             return true;
         }
 
-        // Send XGolds from recipient to sender.
-        // Sender should be present in the Game Developers white list.
-        // Can only be called from program present in the Game Developers white list or by such program.
+        // Send XGolds from sender to recipient.
+        // Sender should be presented in the Game Developers white list.
+        // Can only be called from the program presented in the Game Developers white list or by such program.
         public void Refund(Bytes sender, Bytes recipient, Int64 amount) {
             if (WhiteListCheck(sender) && (Info.Sender() == sender || IsCalledFrom(sender))) {
                 Require(amount > 0, "Amount must be positive");
@@ -92,7 +92,7 @@ namespace Expload {
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
-                    Log.Event("Refund", new EventData(recipient, amount));
+                    Log.Event("Refund", new RefundEventData(sender, recipient, amount));
                 } else {
                     Error.Throw("XGoldError: Not enough funds for Refund operation");
                 }
@@ -131,5 +131,16 @@ namespace Expload {
         }
         public Int64 amount;
         public Bytes recipient;
+    }
+
+    class RefundEventData {
+        public RefundEventData(Bytes sender, Bytes recipient, Int64 amount) {
+            this.sender = sender;
+            this.recipient = recipient;
+            this.amount = amount;
+        }
+        public Bytes sender;
+        public Bytes recipient;
+        public Int64 amount;
     }
 }
