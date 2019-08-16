@@ -57,7 +57,7 @@ namespace Expload {
         }
 
         // Send XGold from transaction Sender to recipient.
-        // Recipient should be present in the Game Developers white list.
+        // Recipient should be presented in the Game Developers whitelist.
         public void Spend(Bytes recipient, Int64 amount) {
             if (WhiteListCheck(recipient)) {
                 Require(amount > 0, "Amount must be positive");
@@ -67,7 +67,7 @@ namespace Expload {
                 if (senderBalance >= amount) {
                     Balance[sender] = senderBalance - amount;
                     Balance[recipient] = recipientBalance + amount;
-                    Log.Event("Spend", new EventData(recipient, amount));
+                    Log.Event("Spend", new SpendEventData(sender, recipient, amount));
                 } else {
                     Error.Throw("XGoldError: Not enough funds for Spend operation");
                 }
@@ -135,6 +135,17 @@ namespace Expload {
 
     class RefundEventData {
         public RefundEventData(Bytes sender, Bytes recipient, Int64 amount) {
+            this.sender = sender;
+            this.recipient = recipient;
+            this.amount = amount;
+        }
+        public Bytes sender;
+        public Bytes recipient;
+        public Int64 amount;
+    }
+
+    class SpendEventData {
+        public SpendEventData(Bytes sender, Bytes recipient, Int64 amount) {
             this.sender = sender;
             this.recipient = recipient;
             this.amount = amount;
